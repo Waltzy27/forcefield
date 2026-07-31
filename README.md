@@ -4,7 +4,6 @@ A lightweight, fully offline desktop stress analysis tool for Linux. Import any 
 
 Built for makers, hobbyists, and engineering students — not a replacement for SolidWorks or ANSYS.
 
-![ForceField UI](https://raw.githubusercontent.com/Waltzy27/forcefield/main/docs/screenshot.png)
 
 ---
 
