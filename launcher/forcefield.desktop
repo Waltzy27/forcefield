@@ -1,0 +1,12 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=ForceField
+GenericName=Stress Analysis Tool
+Comment=Hobbyist FEA — import OBJ files and run simplified stress analysis
+Exec=/opt/forcefield/forcefield
+Icon=/opt/forcefield/forcefield-icon.png
+Terminal=false
+Categories=Science;Engineering;Education;
+Keywords=FEA;stress;strain;OBJ;engineering;mechanics;
+StartupNotify=true
