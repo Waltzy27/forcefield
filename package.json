@@ -6,6 +6,8 @@
   "scripts": {
     "dev": "NODE_ENV=development tsx server/index.ts",
     "build": "tsx script/build.ts",
+    "build:v2": "vite build --config assembly/vite.config.ts",
+    "dev:v2": "vite --config assembly/vite.config.ts",
     "start": "NODE_ENV=production node dist/index.cjs",
     "check": "tsc",
     "db:push": "drizzle-kit push"

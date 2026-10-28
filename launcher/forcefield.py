@@ -121,6 +121,8 @@ def main():
                         help="Port to serve on (default: 47832)")
     parser.add_argument("--no-browser", action="store_true",
                         help="Start server without opening browser")
+    parser.add_argument("--classic", action="store_true",
+                        help="Open the classic single-part V1 app instead of V2")
     args = parser.parse_args()
 
     if not WWW_DIR.exists():
@@ -130,6 +132,8 @@ def main():
 
     port = find_free_port(args.port)
     url = f"http://127.0.0.1:{port}"
+    if not args.classic and (WWW_DIR / "v2" / "index.html").exists():
+        url += "/v2/"
 
     server = HTTPServer(("127.0.0.1", port), SilentHandler)
 

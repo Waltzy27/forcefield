@@ -32,7 +32,14 @@ jobs:
 
       - name: Build app
         run: npm run build
-        # Vite outputs to dist/public/ per vite.config.ts
+        # Vite outputs to dist/public/ per vite.config.ts (Classic V1, site root)
+
+      - name: Build V2 (assembly)
+        run: |
+          npm run build:v2
+          rm -rf dist/public/v2
+          cp -r dist/v2 dist/public/v2
+        # V2 is served at /forcefield/v2/
 
       - name: Configure Pages
         uses: actions/configure-pages@v5

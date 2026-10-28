@@ -4,12 +4,95 @@ A lightweight, fully offline desktop stress analysis tool for Linux. Import any 
 
 Built for makers, hobbyists, and engineering students — not a replacement for SolidWorks or ANSYS.
 
-LIVE APP --> waltzy27.github.io/forcefield 
+## Live apps
+
+| Version | Link | What it is |
+|---|---|---|
+| **V2 — Assembly** (new) | **https://waltzy27.github.io/forcefield/v2/** | Multiple parts, mates, element types, constraint types, variable mesh refinement, deformed-shape view |
+| **V1 — Classic** | https://waltzy27.github.io/forcefield/ | The original single-part OBJ app, unchanged |
+
+The V1 source is also frozen at the git tag [`v1.0.0`](https://github.com/Waltzy27/forcefield/tree/v1.0.0).
 
 
 ---
 
-## Features
+## V2 — Assembly analysis
+
+Everything runs locally in the browser (Web Worker solver). No uploads, no account.
+
+### Workflow
+1. **Project tab** — import one or more `.obj` / `.stl` (ASCII or binary) files. Choose the file's units (mm, cm, m, in) on import. Or click **Try sample assembly**.
+2. **Part tabs** (one per part) — material preset or custom E, ν, yield, UTS, density; position offset and rotation; element type; element size; refinement zones; notes (e.g. heat applied — reference only, no thermal solve).
+3. **Mates tab** — pick a face/hole on part A and one on part B, choose the mate type, optionally **Align** to snap B onto A.
+4. **Loads & BCs tab** — up to **3 point forces** (each at an [X, Y, Z] point with its own direction and magnitude) and any number of supports (so two or more fixed faces/points are fine).
+5. **Preview mesh**, then **Run analysis**. **Results tab** shows per-part peak stress/displacement, the load path (reactions and force carried by each mate), equilibrium check, and solver stats.
+
+### Element types
+| Element | Notes |
+|---|---|
+| Solid Hex (8-node) | Standard trilinear brick |
+| Solid Hex, enhanced (8-node incompatible modes) | Recommended default for chunky parts; avoids shear locking in bending |
+| Solid Tet (4-node) | Linear tetrahedron, stiff in bending; needs fine mesh |
+| Solid Tet (10-node) | Quadratic tetrahedron, much more accurate than Tet4 |
+| Shell (solid-shell) | One enhanced brick layer through the thinnest dimension — for plates/thin walls. Implemented as a solid-shell, not a classical Mindlin shell |
+| Beam (3D frame) | Timoshenko-style 12-DOF frame along the part's long axis; section from bounding box (scaled by volume) or custom A, Iy, Iz, J |
+| Truss / Rod | Axial-only 2-node element |
+
+### Constraint types
+| Constraint | Effect |
+|---|---|
+| Fixed | All translations held |
+| Pinned | Region centroid held (ball joint); region free to rotate about it |
+| Roller / Frictionless | Only the face-normal direction held; slides in-plane |
+| Symmetry | Normal displacement zero on a symmetry plane |
+| Spring / Elastic | Elastic foundation with user stiffness (N/m) |
+| Prescribed displacement | Forces a known displacement vector |
+| Bearing (cylindrical) | Hole/shaft held radially and axially; free to rotate about its axis |
+
+### Mate types
+| Mate | What it ties |
+|---|---|
+| Bonded | Faces glued — all directions transfer load |
+| Planar (face–face contact) | Normal direction only; faces stay parallel but can slide in-plane — usually needs more mates/supports |
+| Concentric (hole–pin) | Radial direction only; free to rotate and slide along the axis |
+| Hinge | Radial + axial held; free to rotate about the axis |
+
+If a mate set leaves a part free to move as a rigid body, the solver refuses to run and names the part, rather than showing meaningless results.
+
+### Mesh refinement
+Each part has a base element size. Add **refinement zones** (center, radius, factor) to use smaller elements near corners/holes/loads and larger ones elsewhere. **Auto-refine** also grades the mesh around loads, supports, mates, and concave edges. Mesh size is up to you — big meshes take longer and more memory.
+
+### Deformed shape
+Results views draw the model in its deformed shape. A slider scales the deformation (with **True scale** for 1:1) and an **Undeformed** ghost shows the original outline — a cantilever visibly bends.
+
+### Exports
+Project JSON (save/reopen a setup), node results CSV, PNG snapshot.
+
+### Accuracy check (cantilever 1 × 0.1 × 0.1 m steel, 1000 N tip load, vs. beam theory)
+| Element | Tip deflection / theory |
+|---|---|
+| Beam | 0.99 |
+| Hex8 enhanced / Shell | 0.98 |
+| Hex8 | 0.95 |
+| Tet10 | 0.89 |
+| Tet4 | 0.79 |
+
+Reactions balance to < 0.1 % of applied load. The mesh is a graded voxel-style grid fitted inside the imported surface, so curved surfaces are stair-stepped; peak stresses at sharp corners and point loads are mesh-dependent. This is a learning/hobby tool, not a certified analysis code. Linear static, small-displacement, linear-elastic only; mates are linear (no separation or friction).
+
+### Run V2 locally
+```bash
+npm ci
+npm run build:v2          # outputs dist/v2
+cd dist/v2 && python3 -m http.server 8080
+# open http://localhost:8080
+```
+(It must be served over http — browsers block the solver worker on `file://`.) `bash build.sh` now builds both versions and `python3 launcher/forcefield.py` opens V2; add `--classic` for V1.
+
+---
+
+## V1 — Classic
+
+### Features
 
 - **OBJ file import** — drag and drop any `.OBJ` model
 - **Face constraint selection** — click directly on the mesh to fasten a face

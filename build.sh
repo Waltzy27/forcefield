@@ -55,6 +55,8 @@ echo ""
 # ── 3. Build the web app ─────────────────────────────────────────────────────
 echo "[3/3] Building the web app (npm run build)..."
 npm run build
+echo "Building V2 (multi-part assembly)..."
+npm run build:v2
 echo ""
 
 # ── 4. Copy built assets into the launcher ───────────────────────────────────
@@ -62,6 +64,8 @@ echo "Copying built assets to launcher/www/..."
 rm -rf launcher/www
 mkdir -p launcher/www
 cp -r dist/public/* launcher/www/
+mkdir -p launcher/www/v2
+cp -r dist/v2/* launcher/www/v2/
 echo ""
 
 echo "╔══════════════════════════════════════════╗"
